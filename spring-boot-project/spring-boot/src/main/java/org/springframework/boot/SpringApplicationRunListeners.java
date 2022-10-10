@@ -38,6 +38,7 @@ class SpringApplicationRunListeners {
 
 	private final Log log;
 
+	// 一般是EventPublishingRunListener，也可以自定义，在META-INF/spring.factories里面进行添加声明
 	private final List<SpringApplicationRunListener> listeners;
 
 	private final ApplicationStartup applicationStartup;
@@ -59,6 +60,7 @@ class SpringApplicationRunListeners {
 	}
 
 	void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {
+		// 环境准备，active profile读取yml  properties  xml相关的配置信息
 		doWithListeners("spring.boot.application.environment-prepared",
 				(listener) -> listener.environmentPrepared(bootstrapContext, environment));
 	}

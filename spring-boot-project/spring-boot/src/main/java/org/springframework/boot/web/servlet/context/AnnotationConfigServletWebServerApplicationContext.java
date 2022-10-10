@@ -73,7 +73,9 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
+		// 注解相关bean的reader
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		// calssPathBean 扫描器
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 

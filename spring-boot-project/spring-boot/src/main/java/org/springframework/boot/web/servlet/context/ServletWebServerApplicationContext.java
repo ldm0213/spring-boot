@@ -153,10 +153,15 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 	}
 
+	// refresh中会调用onRefresh方法，这里进行了webServer的创建，默认是TomcatWebServer
 	@Override
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			// 创建一个 WebServer服务（默认 Tomcat），并初始化ServletContext上下文
+			// 会先创建一个Tomcat容器并启动，同时会注册各种Servlet，
+			// 例如借助org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration
+			// 注册DispatcherServlet对象到ServletContext上下文，这样就可以通过Spring MVC的核心组件来实现一个Web应用
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -176,9 +181,12 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
+			// 如果获取到的 WebServer 和 ServletContext 都为空，说明需要使用内嵌的 Tomcat 容器
 			StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
+			// 该过程会创建一个 Tomcat 容器并启动，启动过程异步触发了 TomcatStarter#onStartup 方法
+			// 这里会异步触发TomcatStarter#onStartup方法
 			this.webServer = factory.getWebServer(getSelfInitializer());
 			createWebServer.end();
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
@@ -188,6 +196,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 		else if (servletContext != null) {
 			try {
+				// 如果 ServletContext 不为空，说明使用了外部的 Servlet 容器（例如 Tomcat）
+				// 那么这里主动调用 this#selfInitialize(ServletContext) 方法来注册各种 Servlet、Filter
 				getSelfInitializer().onStartup(servletContext);
 			}
 			catch (ServletException ex) {
@@ -205,6 +215,10 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 */
 	protected ServletWebServerFactory getWebServerFactory() {
 		// Use bean names so that we don't consider the hierarchy
+
+		// 获取当前 BeanFactory 中类型为 ServletWebServerFactory 的 Bean 的名称，不考虑层次性，必须存在一个，否则抛出异常
+		// 所以想要切换 Servlet 容器得引入对应的 Starter 模块并排除 `spring-boot-starter-web` 中默认的 `tomcat` Starter 模块
+		// 在 spring-boot-autoconfigure 中有一个 ServletWebServerFactoryConfiguration 配置类会注册一个 TomcatServletWebServerFactory 对象
 		String[] beanNames = getBeanFactory().getBeanNamesForType(ServletWebServerFactory.class);
 		if (beanNames.length == 0) {
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to missing "

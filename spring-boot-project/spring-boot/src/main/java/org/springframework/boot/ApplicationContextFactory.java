@@ -39,11 +39,18 @@ public interface ApplicationContextFactory {
 	/**
 	 * A default {@link ApplicationContextFactory} implementation that will create an
 	 * appropriate context for the {@link WebApplicationType}.
+	 *
+	 * 从META-INF/spring.factories中读取ApplicationContextFactory，根据webApplicationType来决定生成哪个ApplicationContext
+	 * SERVLET:  AnnotationConfigServletWebServerApplicationContext
+	 * REACTIVE: AnnotationConfigReactiveWebServerApplicationContext
+	 * NONE: AnnotationConfigApplicationContext
 	 */
 	ApplicationContextFactory DEFAULT = (webApplicationType) -> {
 		try {
 			for (ApplicationContextFactory candidate : SpringFactoriesLoader
 					.loadFactories(ApplicationContextFactory.class, ApplicationContextFactory.class.getClassLoader())) {
+				// org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext.Factory
+				// org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext.Factory
 				ConfigurableApplicationContext context = candidate.create(webApplicationType);
 				if (context != null) {
 					return context;

@@ -41,6 +41,8 @@ import org.springframework.util.Assert;
  * registered application contexts as well as any actions registered via
  * {@link SpringApplication#getShutdownHandlers()}.
  *
+ * SpringBoot优雅关闭的线程类
+ *
  * @author Andy Wilkinson
  * @author Phillip Webb
  * @author Brian Clozel

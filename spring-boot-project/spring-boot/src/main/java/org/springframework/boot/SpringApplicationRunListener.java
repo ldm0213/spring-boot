@@ -28,6 +28,10 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
  * instance and a {@code String[]} of arguments. A new
  * {@link SpringApplicationRunListener} instance will be created for each run.
  *
+ * SpringApplicationRunListener是一个监听SpringApplication中run方法的接口,在项目启动过程的各个阶段进行事件的发布。
+ * 实现SpringApplicationRunListener接口的类由类路径下加载(META-INF/spring.factories)进行初始化。
+ * 想要实现SpringApplicationRunListener接口，需要提供能够接收SpringApplication和String[] args的构造器。
+ *
  * @author Phillip Webb
  * @author Dave Syer
  * @author Andy Wilkinson

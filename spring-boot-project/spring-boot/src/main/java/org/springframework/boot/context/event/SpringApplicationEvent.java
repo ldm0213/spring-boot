@@ -22,6 +22,8 @@ import org.springframework.context.ApplicationEvent;
 /**
  * Base class for {@link ApplicationEvent} related to a {@link SpringApplication}.
  *
+ * SpringApplication事件基类
+ *
  * @author Phillip Webb
  * @since 1.0.0
  */

@@ -54,8 +54,10 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 
 	private final String[] args;
 
+	// 事件发送--观察者模式
 	private final SimpleApplicationEventMulticaster initialMulticaster;
 
+	//
 	public EventPublishingRunListener(SpringApplication application, String[] args) {
 		this.application = application;
 		this.args = args;
@@ -72,6 +74,7 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 
 	@Override
 	public void starting(ConfigurableBootstrapContext bootstrapContext) {
+		// run方法开始执行，发布ApplicationStartingEvent事件
 		this.initialMulticaster
 				.multicastEvent(new ApplicationStartingEvent(bootstrapContext, this.application, this.args));
 	}
@@ -79,18 +82,21 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 	@Override
 	public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
 			ConfigurableEnvironment environment) {
+		// 环境准备好时，发布ApplicationEnvironmentPreparedEvent事件
 		this.initialMulticaster.multicastEvent(
 				new ApplicationEnvironmentPreparedEvent(bootstrapContext, this.application, this.args, environment));
 	}
 
 	@Override
 	public void contextPrepared(ConfigurableApplicationContext context) {
+		// 容器的上下文准备初始化完毕，发布ApplicationContextInitializedEvent
 		this.initialMulticaster
 				.multicastEvent(new ApplicationContextInitializedEvent(this.application, this.args, context));
 	}
 
 	@Override
 	public void contextLoaded(ConfigurableApplicationContext context) {
+		// 上下文加载配置时候，对应ApplicationPreparedEvent
 		for (ApplicationListener<?> listener : this.application.getListeners()) {
 			if (listener instanceof ApplicationContextAware) {
 				((ApplicationContextAware) listener).setApplicationContext(context);
@@ -102,18 +108,22 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 
 	@Override
 	public void started(ConfigurableApplicationContext context) {
+		// 上下文刷新且应用启动时，并且在CommandLineRunner和ApplicationRunners还没唤醒前，发布程序以及启动事件ApplicationStartedEvent
 		context.publishEvent(new ApplicationStartedEvent(this.application, this.args, context));
 		AvailabilityChangeEvent.publish(context, LivenessState.CORRECT);
 	}
 
 	@Override
 	public void running(ConfigurableApplicationContext context) {
+		// 在上下文刷新，应用已经启动，在CommandLineRunner和ApplicationRunners唤醒后，
+		// 并且在run方法快执行结束前执行，发布ApplicationReadyEvent，代表程序已经准备好
 		context.publishEvent(new ApplicationReadyEvent(this.application, this.args, context));
 		AvailabilityChangeEvent.publish(context, ReadinessState.ACCEPTING_TRAFFIC);
 	}
 
 	@Override
 	public void failed(ConfigurableApplicationContext context, Throwable exception) {
+		// 当运行程序失败时，发布ApplicationFailedEvent事件
 		ApplicationFailedEvent event = new ApplicationFailedEvent(this.application, this.args, context, exception);
 		if (context != null && context.isActive()) {
 			// Listeners have been registered to the application context so we should
