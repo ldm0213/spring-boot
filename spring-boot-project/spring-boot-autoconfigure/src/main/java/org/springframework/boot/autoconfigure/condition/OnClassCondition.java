@@ -50,6 +50,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		// processor is available. Using a single additional thread seems to offer the
 		// best performance. More threads make things worse.
 		if (autoConfigurationClasses.length > 1 && Runtime.getRuntime().availableProcessors() > 1) {
+			// 多线程判断
 			return resolveOutcomesThreaded(autoConfigurationClasses, autoConfigurationMetadata);
 		}
 		else {

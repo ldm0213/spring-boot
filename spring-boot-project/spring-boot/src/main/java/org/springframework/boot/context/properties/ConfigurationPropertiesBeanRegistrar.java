@@ -34,6 +34,10 @@ import org.springframework.util.StringUtils;
  * {@link ConfigurationPropertiesScanRegistrar} to register a bean definition for a
  * {@link ConfigurationProperties @ConfigurationProperties} class.
  *
+ * ConfigurationPropertiesBeanRegistrar是BeanDefinitionRegistry注册器的代理实现类，
+ * 代理类被EnableConfigurationPropertiesRegistrar和ConfigurationPropertiesScanRegistrar注册器类使用，
+ * 用于将@ConfigurationProperties标注的bean注册为一个bean定义
+ *
  * @author Madhura Bhave
  * @author Phillip Webb
  */
@@ -61,6 +65,7 @@ final class ConfigurationPropertiesBeanRegistrar {
 		}
 	}
 
+	// 获取带有@ConfigurationProperties注解标注bean前缀的beanName
 	private String getName(Class<?> type, MergedAnnotation<ConfigurationProperties> annotation) {
 		String prefix = annotation.isPresent() ? annotation.getString("prefix") : "";
 		return (StringUtils.hasText(prefix) ? prefix + "-" + type.getName() : type.getName());

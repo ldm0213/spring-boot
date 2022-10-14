@@ -62,9 +62,9 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
-@ConditionalOnClass(ServletRequest.class)
-@ConditionalOnWebApplication(type = Type.SERVLET)
-@EnableConfigurationProperties(ServerProperties.class)
+@ConditionalOnClass(ServletRequest.class) // 必须有servletRequest这个类这个配置才能生效，不然会被过滤掉
+@ConditionalOnWebApplication(type = Type.SERVLET)  // type来进行servlet相关的声明
+@EnableConfigurationProperties(ServerProperties.class) // 配置信息，需要有prefix，可以在application.yml/properties里面定义
 @Import({ ServletWebServerFactoryAutoConfiguration.BeanPostProcessorsRegistrar.class,
 		ServletWebServerFactoryConfiguration.EmbeddedTomcat.class,
 		ServletWebServerFactoryConfiguration.EmbeddedJetty.class,

@@ -37,6 +37,8 @@ import org.springframework.stereotype.Indexed;
  * most idiomatic Spring Boot applications will inherit it from
  * {@code @SpringBootApplication}.
  *
+ * 实际就是一个Configuration注解，定义了是否进行CGLIB增强
+ *
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @since 1.4.0

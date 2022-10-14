@@ -29,6 +29,14 @@ import org.springframework.util.StringUtils;
 /**
  * Internal utility used to load {@link AutoConfigurationMetadata}.
  *
+ * 从META-INF/spring-autoconfigure-metadata.properties中load相关的Configuration
+ *
+ * -----这个文件是如何得到的？？？？？？
+ *  spring-boot-autoconfigure 模块会引入该spring-boot-autoconfigure-processor模块，
+ *  Spring Boot 在编译 spring-boot-autoconfigure 这个 jar 包的时候，在编译阶段会扫描到
+ *  带有 @ConditionalOnClass 等注解的 .class 文件，也就是自动配置类，然后将自动配置类的一些
+ *  信息保存至 META-INF/spring-autoconfigure-metadata.properties 文件中
+ *  *
  * @author Phillip Webb
  */
 final class AutoConfigurationMetadataLoader {
@@ -39,17 +47,21 @@ final class AutoConfigurationMetadataLoader {
 	}
 
 	static AutoConfigurationMetadata loadMetadata(ClassLoader classLoader) {
+		// 从META-INF/spring-autoconfigure-metadata.properties中load相关的Configuration
 		return loadMetadata(classLoader, PATH);
 	}
 
 	static AutoConfigurationMetadata loadMetadata(ClassLoader classLoader, String path) {
 		try {
+			// 获取所有 `META-INF/spring-autoconfigure-metadata.properties` 文件 URL
 			Enumeration<URL> urls = (classLoader != null) ? classLoader.getResources(path)
 					: ClassLoader.getSystemResources(path);
 			Properties properties = new Properties();
 			while (urls.hasMoreElements()) {
+				// 加载这些文件并将他们的属性添加到 Properties 中
 				properties.putAll(PropertiesLoaderUtils.loadProperties(new UrlResource(urls.nextElement())));
 			}
+			// 将这个 Properties 封装到 PropertiesAutoConfigurationMetadata 对象中并返回
 			return loadMetadata(properties);
 		}
 		catch (IOException ex) {

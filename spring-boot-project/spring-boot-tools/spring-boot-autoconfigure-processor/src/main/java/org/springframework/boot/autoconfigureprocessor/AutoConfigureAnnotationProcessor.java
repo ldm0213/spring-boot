@@ -49,6 +49,18 @@ import javax.tools.StandardLocation;
  * Annotation processor to store certain annotations from auto-configuration classes in a
  * property file.
  *
+ * Processor会在编译阶段初始化，然后对当前模块内的代码进行一次扫描，然后获取到对应的注解，之后调用process方法，然后我们根据这些注解类来做一些后续操作
+ *
+ * Spring Boot提供的自动配置类比较多，而我们不可能使用到很多自动配置功能，大部分都没必要，如果每次你启动应用的过程中，
+ * 都需要一个一个去解析他们上面的 Conditional 注解，那么肯定会有不少的性能损耗，Spring Boot 通过AutoConfigureAnnotationProcessor，
+ * 在编译阶段将自动配置类的一些注解信息保存在一个 properties 文件中，这样一来，启动应用的过程中，
+ * 就可以直接读取该文件中的信息，提前过滤掉一些自动配置类，相比于每次都去解析它们所有的注解，性能提升不少
+ *
+ *
+ * spring-boot-autoconfigure 模块会引入该工具模块，那么 Spring Boot 在编译 spring-boot-autoconfigure 这个 jar 包的时候，
+ * 在编译阶段会扫描到带有 @ConditionalOnClass 等注解的 .class 文件，也就是自动配置类，
+ * 然后将自动配置类的一些信息保存至 META-INF/spring-autoconfigure-metadata.properties 文件中
+ *
  * @author Madhura Bhave
  * @author Phillip Webb
  * @since 1.5.0
@@ -108,11 +120,15 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+		// 遍历上面的几个 `@Conditional` 注解和几个定义自动配置类顺序的注解，依次进行处理
 		for (Map.Entry<String, String> entry : this.annotations.entrySet()) {
+			// 找到标注了指定注解的类，然后解析出该注解的值，保存至 Properties
+			// 例如 `类名.注解简称` => `注解中的值(逗号分隔)` 和 `类名` => `空字符串`，将自动配置类的信息已经对应注解的信息都保存起来
 			process(roundEnv, entry.getKey(), entry.getValue());
 		}
 		if (roundEnv.processingOver()) {
 			try {
+				// 将 Properties 写入 `META-INF/spring-autoconfigure-metadata.properties` 文件
 				writeProperties();
 			}
 			catch (Exception ex) {
@@ -123,8 +139,10 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 	}
 
 	private void process(RoundEnvironment roundEnv, String propertyKey, String annotationName) {
+		// 获取到这个注解名称对应的 Java 类型
 		TypeElement annotationType = this.processingEnv.getElementUtils().getTypeElement(annotationName);
 		if (annotationType != null) {
+			// 如果存在该注解，则从 RoundEnvironment 中获取标注了该注解的所有 Element 元素，进行遍历
 			for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {
 				processElement(element, propertyKey, annotationName);
 			}
@@ -133,11 +151,16 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 
 	private void processElement(Element element, String propertyKey, String annotationName) {
 		try {
+			// 获取这个类的名称
 			String qualifiedName = Elements.getQualifiedName(element);
+			// 获取这个类上面的 `annotationName` 类型的注解信息
 			AnnotationMirror annotation = getAnnotation(element, annotationName);
 			if (qualifiedName != null && annotation != null) {
+				// 获取这个注解中的值
 				List<Object> values = getValues(propertyKey, annotation);
+				// 往 `properties` 中添加 `类名.注解简称` => `注解中的值(逗号分隔)`
 				this.properties.put(qualifiedName + "." + propertyKey, toCommaDelimitedString(values));
+				// 往 `properties` 中添加 `类名` => `空字符串`
 				this.properties.put(qualifiedName, "");
 			}
 		}
@@ -180,6 +203,7 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 			FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", PROPERTIES_PATH);
 			try (Writer writer = new OutputStreamWriter(file.openOutputStream(), StandardCharsets.UTF_8)) {
 				for (Map.Entry<String, String> entry : this.properties.entrySet()) {
+					// 自动配置类类名.注解简称 --> 注解中的值(逗号分隔)，自动配置类类名 --> 空字符串
 					writer.append(entry.getKey());
 					writer.append("=");
 					writer.append(entry.getValue());

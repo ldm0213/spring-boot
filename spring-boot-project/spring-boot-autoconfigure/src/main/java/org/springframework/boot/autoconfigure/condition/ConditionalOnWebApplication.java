@@ -29,6 +29,8 @@ import org.springframework.context.annotation.Conditional;
  * application. By default, any web application will match but it can be narrowed using
  * the {@link #type()} attribute.
  *
+ * 是否是webApplicaiton
+ *
  * @author Dave Syer
  * @author Stephane Nicoll
  * @since 1.0.0

@@ -17,16 +17,24 @@
 package smoketest.tomcat.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
 public class HelloWorldService {
 
 	@Value("${name:World}")
 	private String name;
 
 	public String getHelloMessage() {
-		return "Hello " + this.name;
+		return "Hello " + this.name + " " + this.msg;
+	}
+
+	private String msg;
+
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+
+	public String getMsg() {
+		return msg;
 	}
 
 }

@@ -66,6 +66,14 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
  * {@link ConditionalOnClass @ConditionalOnClass} and
  * {@link ConditionalOnMissingBean @ConditionalOnMissingBean} annotations).
  *
+ * Spring Boot 自定义注解，用于驱动 Spring Boot 自动配置模块，可以自动加载一些可能需要用到的配置类，
+ * 可以通过exclude或者excludeName来显式的排除不想用的配置信息，当然也可以通过spring.autoconfigure.exclude属性来排除掉
+ *
+ * Spring Boot启动的时候会通过@EnableAutoConfiguration注解找到META-INF/spring.factories配置文件中的所有自动配置类，
+ * 并对其进行加载，而这些自动配置类都是以AutoConfiguration结尾来命名的，它实际上就是一个JavaConfig形式的Spring容器配置类，
+ * 它能通过以Properties结尾命名的类中取得在全局配置文件中配置的属性如：server.port，而XxxxProperties类是通过@ConfigurationProperties
+ * 注解与全局配置文件中对应的属性进行绑定的。
+ *
  * @author Phillip Webb
  * @author Stephane Nicoll
  * @since 1.0.0
@@ -79,8 +87,8 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@AutoConfigurationPackage
-@Import(AutoConfigurationImportSelector.class)
+@AutoConfigurationPackage  // 注册一个 Bean 保存当前注解标注的类所在包路径
+@Import(AutoConfigurationImportSelector.class) // Spring Boot 自动配置的实现
 public @interface EnableAutoConfiguration {
 
 	/**

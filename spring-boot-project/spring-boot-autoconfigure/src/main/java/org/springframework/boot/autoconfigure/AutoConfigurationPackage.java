@@ -30,6 +30,9 @@ import org.springframework.context.annotation.Import;
  * base packages} or {@link #basePackageClasses base package classes} are specified, the
  * package of the annotated class is registered.
  *
+ * 将当前注解所标注的类所在包名封装成一个org.springframework.boot.autoconfigure.AutoConfigurationPackages.BasePackages进行注册
+ * 注册这个自动配置包名相关的bean是为了被其他地方引用，例如 JPA 模块的会使用到这个对象（JPA entity scanner）
+ *
  * @author Phillip Webb
  * @since 1.3.0
  * @see AutoConfigurationPackages

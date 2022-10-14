@@ -16,11 +16,6 @@
 
 package org.springframework.boot.autoconfigure;
 
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.ResourceLoaderAware;
-
 /**
  * Filter that can be registered in {@code spring.factories} to limit the
  * auto-configuration classes considered. This interface is designed to allow fast removal
@@ -35,6 +30,8 @@ import org.springframework.context.ResourceLoaderAware;
  * <li>{@link BeanClassLoaderAware}</li>
  * <li>{@link ResourceLoaderAware}</li>
  * </ul>
+ *
+ * Spring自动配置的过滤器，过滤掉不需要的Configuration
  *
  * @author Phillip Webb
  * @since 1.5.0

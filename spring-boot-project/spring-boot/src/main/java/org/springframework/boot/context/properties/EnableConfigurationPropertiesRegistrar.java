@@ -33,6 +33,8 @@ import org.springframework.core.type.AnnotationMetadata;
  * {@link ImportBeanDefinitionRegistrar} for
  * {@link EnableConfigurationProperties @EnableConfigurationProperties}.
  *
+ * 将标记了@ConfigurationProperties的bean绑定配置文件中的属性并将其注册到IOC容器之中
+ *
  * @author Phillip Webb
  * @author Andy Wilkinson
  */
@@ -43,12 +45,17 @@ class EnableConfigurationPropertiesRegistrar implements ImportBeanDefinitionRegi
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+		// 注册基础设施bean
 		registerInfrastructureBeans(registry);
 		registerMethodValidationExcludeFilter(registry);
+		// 创建注册器代理类
 		ConfigurationPropertiesBeanRegistrar beanRegistrar = new ConfigurationPropertiesBeanRegistrar(registry);
+		// 获取注解@EnableConfigurationProperties指定的被@ConfigurationProperties注解标注的bean实例对象
+		// forEach循环调用注册器方法将@ConfigurationProperties标注的bean注册到IOC容器之中
 		getTypes(metadata).forEach(beanRegistrar::register);
 	}
 
+	// 获取注解@EnableConfigurationProperties指定的被@ConfigurationProperties注解标注的bean实例对象
 	private Set<Class<?>> getTypes(AnnotationMetadata metadata) {
 		return metadata.getAnnotations().stream(EnableConfigurationProperties.class)
 				.flatMap((annotation) -> Arrays.stream(annotation.getClassArray(MergedAnnotation.VALUE)))
@@ -56,7 +63,9 @@ class EnableConfigurationPropertiesRegistrar implements ImportBeanDefinitionRegi
 	}
 
 	static void registerInfrastructureBeans(BeanDefinitionRegistry registry) {
+		// 将BeanPostProcessor bean后置处理器ConfigurationPropertiesBindingPostProcessor注册到IOC容器
 		ConfigurationPropertiesBindingPostProcessor.register(registry);
+		// 将提供属性绑定的BoundConfigurationProperties类注册到IOC容器之中
 		BoundConfigurationProperties.register(registry);
 	}
 

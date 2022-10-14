@@ -43,6 +43,8 @@ import org.springframework.data.repository.Repository;
  * annotation that is equivalent to declaring {@code @Configuration},
  * {@code @EnableAutoConfiguration} and {@code @ComponentScan}.
  *
+ * 自动配置注解: 实际是一个组合注解，里面的每个配置都是元注解中对应的属性
+ *
  * @author Phillip Webb
  * @author Stephane Nicoll
  * @author Andy Wilkinson
@@ -51,7 +53,7 @@ import org.springframework.data.repository.Repository;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Inherited
+@Inherited // 表明该注解定义在某个类上时，其子类会继承该注解
 @SpringBootConfiguration
 @EnableAutoConfiguration
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
@@ -60,6 +62,7 @@ public @interface SpringBootApplication {
 
 	/**
 	 * Exclude specific auto-configuration classes such that they will never be applied.
+	 * 不需要自动配置的 Class 类
 	 * @return the classes to exclude
 	 */
 	@AliasFor(annotation = EnableAutoConfiguration.class)
@@ -68,6 +71,7 @@ public @interface SpringBootApplication {
 	/**
 	 * Exclude specific auto-configuration class names such that they will never be
 	 * applied.
+	 * 不需要自动配置的类名称
 	 * @return the class names to exclude
 	 * @since 1.3.0
 	 */
@@ -83,6 +87,8 @@ public @interface SpringBootApplication {
 	 * scanning or Spring Data {@link Repository} scanning. For those you should add
 	 * {@link org.springframework.boot.autoconfigure.domain.EntityScan @EntityScan} and
 	 * {@code @Enable...Repositories} annotations.
+	 *
+	 * 扫描的包
 	 * @return base packages to scan
 	 * @since 1.3.0
 	 */
@@ -101,6 +107,9 @@ public @interface SpringBootApplication {
 	 * scanning or Spring Data {@link Repository} scanning. For those you should add
 	 * {@link org.springframework.boot.autoconfigure.domain.EntityScan @EntityScan} and
 	 * {@code @Enable...Repositories} annotations.
+	 *
+	 * 扫描的类
+	 *
 	 * @return base packages to scan
 	 * @since 1.3.0
 	 */
@@ -142,6 +151,9 @@ public @interface SpringBootApplication {
 	 * individually like when declared on non-{@code @Configuration} classes, a.k.a.
 	 * "@Bean Lite Mode" (see {@link Bean @Bean's javadoc}). It is therefore behaviorally
 	 * equivalent to removing the {@code @Configuration} stereotype.
+	 *
+	 * 被标记的Bean是否进行CGLIB提升
+	 *
 	 * @since 2.2
 	 * @return whether to proxy {@code @Bean} methods
 	 */

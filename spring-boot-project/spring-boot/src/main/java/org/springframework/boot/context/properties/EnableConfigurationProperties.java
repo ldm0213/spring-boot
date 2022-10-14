@@ -31,6 +31,12 @@ import org.springframework.context.annotation.Import;
  * (for example using {@link Bean @Bean} methods) or, for convenience, can be specified
  * directly on this annotation.
  *
+ * EnableConfigurationProperties负责导入这个已经绑定了属性的bean到spring容器中
+ * application.yml/properties中的配置如何绑定到bean上:
+ *   	在全局配置的属性如：server.port等，通过@ConfigurationProperties注解，
+ * 	    绑定到对应的XxxxProperties配置实体类上封装为一个bean，
+ *      然后再通过@EnableConfigurationProperties注解导入到Spring容器中
+ *
  * @author Dave Syer
  * @since 1.0.0
  */
@@ -50,6 +56,9 @@ public @interface EnableConfigurationProperties {
 	 * Convenient way to quickly register
 	 * {@link ConfigurationProperties @ConfigurationProperties} annotated beans with
 	 * Spring. Standard Spring Beans will also be scanned regardless of this value.
+	 *
+	 * 指定被@ConfigurationProperties注解标注的bean将会被注册到IOC容器
+	 *
 	 * @return {@code @ConfigurationProperties} annotated beans to register
 	 */
 	Class<?>[] value() default {};

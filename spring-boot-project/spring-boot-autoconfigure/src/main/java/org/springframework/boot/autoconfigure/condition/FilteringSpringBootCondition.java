@@ -34,6 +34,8 @@ import org.springframework.util.CollectionUtils;
  * Abstract base class for a {@link SpringBootCondition} that also implements
  * {@link AutoConfigurationImportFilter}.
  *
+ * 提供了自动配置类过滤+条件判断
+ *
  * @author Phillip Webb
  */
 abstract class FilteringSpringBootCondition extends SpringBootCondition
@@ -98,6 +100,9 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 	/**
 	 * Slightly faster variant of {@link ClassUtils#forName(String, ClassLoader)} that
 	 * doesn't deal with primitives, arrays or inner types.
+	 *
+	 * classLoader中是否有className对应的类
+	 *
 	 * @param className the class name to resolve
 	 * @param classLoader the class loader to use
 	 * @return a resolved class
@@ -132,6 +137,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 
 		abstract boolean matches(String className, ClassLoader classLoader);
 
+		// 查看类是否存在
 		static boolean isPresent(String className, ClassLoader classLoader) {
 			if (classLoader == null) {
 				classLoader = ClassUtils.getDefaultClassLoader();

@@ -37,6 +37,8 @@ import org.springframework.stereotype.Indexed;
  * Note that contrary to {@code @Value}, SpEL expressions are not evaluated since property
  * values are externalized.
  *
+ * 从配置文件中绑定属性到对应的bean上
+ *
  * @author Dave Syer
  * @since 1.0.0
  * @see ConfigurationPropertiesScan

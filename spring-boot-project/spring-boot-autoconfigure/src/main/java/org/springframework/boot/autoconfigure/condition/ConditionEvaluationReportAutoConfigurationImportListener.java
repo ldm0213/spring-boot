@@ -37,6 +37,7 @@ class ConditionEvaluationReportAutoConfigurationImportListener
 	@Override
 	public void onAutoConfigurationImportEvent(AutoConfigurationImportEvent event) {
 		if (this.beanFactory != null) {
+			// 记录符合条件的configuration
 			ConditionEvaluationReport report = ConditionEvaluationReport.get(this.beanFactory);
 			report.recordEvaluationCandidates(event.getCandidateConfigurations());
 			report.recordExclusions(event.getExclusions());

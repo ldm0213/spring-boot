@@ -64,6 +64,8 @@ import org.springframework.util.StringUtils;
 /**
  * {@link Condition} that checks for the presence or absence of specific beans.
  *
+ * 用来判断Spring容器中是否存在指定条件的bean
+ *
  * @author Phillip Webb
  * @author Dave Syer
  * @author Jakub Kubrynski

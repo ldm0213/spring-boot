@@ -47,6 +47,8 @@ import org.springframework.util.unit.DataSize;
  * {@link ConfigurationProperties @ConfigurationProperties} for a web server (e.g. port
  * and path settings).
  *
+ * server配置：port address，前缀是server（server.port  server.address)
+ *
  * @author Dave Syer
  * @author Stephane Nicoll
  * @author Andy Wilkinson

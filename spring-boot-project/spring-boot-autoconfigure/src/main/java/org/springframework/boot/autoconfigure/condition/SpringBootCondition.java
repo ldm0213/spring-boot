@@ -40,12 +40,22 @@ public abstract class SpringBootCondition implements Condition {
 
 	private final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 判断某个注解的类或者方法是否匹配
+	 *
+	 * @param context 跟Condition的上下文有关，主要用来获取Registry,BeanFactory,Environment,ResourceLoader和ClassLoader等
+	 * @param metadata 注解元数据，可以是class元注解或者method元注解。可以拿到某个注解的一些元数据，而这些元数据就包含了某个注解里面的属性
+	 * @return
+	 */
 	@Override
 	public final boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		String classOrMethodName = getClassOrMethodName(metadata);
 		try {
+			// 不同的子类实现具体的逻辑
 			ConditionOutcome outcome = getMatchOutcome(context, metadata);
+			// 打印匹配或者不匹配的信息
 			logOutcome(classOrMethodName, outcome);
+			// 除了打印日志外，这些是否匹配的信息还要记录到ConditionEvaluationReport中
 			recordEvaluation(context, classOrMethodName, outcome);
 			return outcome.isMatch();
 		}
@@ -72,6 +82,7 @@ public abstract class SpringBootCondition implements Condition {
 		return metadata.toString();
 	}
 
+	// 获取注解对应的类名字或者方法名: 类名#方法名
 	private static String getClassOrMethodName(AnnotatedTypeMetadata metadata) {
 		if (metadata instanceof ClassMetadata) {
 			ClassMetadata classMetadata = (ClassMetadata) metadata;
